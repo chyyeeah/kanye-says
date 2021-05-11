@@ -1,20 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import deleteCookie from '../utils/deleteCookie';
+import React from 'react';
 
-export default ({ setIsAuthenticated }) => {
-  const [ quote, setQuote ] = useState('');
-
-  useEffect(() => {
-    axios.get('/quote')
-      .then(res => {
-        setQuote(res.data);
-      })
-      .catch(err => {
-        deleteCookie('token');
-        setIsAuthenticated(false);
-      });
-  }, []);
-
-  return <h1>Quote!</h1>
+export default ({ quote }) => {
+  return <h1>{quote}</h1>
 };
