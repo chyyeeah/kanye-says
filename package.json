@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/chyyeeah/kanye-says#readme",
   "dependencies": {
+    "@material-ui/core": "^4.11.4",
     "axios": "^0.21.1",
     "babel-loader": "^8.2.2",
     "cookie-parser": "^1.4.5",
