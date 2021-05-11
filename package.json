@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --watch --mode=development --devtool=inline-source-map",
+    "build": "webpack --watch --mode=development --devtool=eval",
     "start": "nodemon server/index.js"
   },
   "repository": {
