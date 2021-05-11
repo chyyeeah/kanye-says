@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const axios = require('axios');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
@@ -15,7 +16,7 @@ app.use(express.static(path.resolve('client/dist')));
 const generateAccessToken = data => jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
-  if (token === null) return res.sendStatus(401);
+  if (token === null || token === undefined) return res.sendStatus(401);
 
   jwt.verify(token, process.env.TOKEN_SECRET, (err, username) => {
     if (err) {
@@ -36,6 +37,17 @@ app.post('/jwt', (req, res) => {
 app.get('/test', authenticateToken, (req, res) => {
   console.log(req.cookies);
   res.send('hello');
+});
+
+app.get('/quote', authenticateToken, async (req, res) => {
+  try {
+    const kayneResponse = await axios.get('https://api.kanye.rest/');
+    const quote = kayneResponse.data;
+    res.send(quote);
+  } catch (err) {
+    console.log('error', err);
+    res.status(500).send(err);
+  }
 });
 
 app.get('/*', (req, res) => {
