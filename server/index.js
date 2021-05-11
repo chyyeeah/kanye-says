@@ -4,7 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const jwt = require('jsonwebtoken');
+const { generateAccessToken, authenticateToken } = require('./utils/jwtHelpers.js');
 
 const app = express();
 const PORT = 3000;
@@ -12,22 +12,6 @@ const PORT = 3000;
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.static(path.resolve('client/dist')));
-
-const generateAccessToken = data => jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '432000s' });
-const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token;
-  if (token === null || token === undefined) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.TOKEN_SECRET, (err, username) => {
-    if (err) {
-      console.log('err', err);
-      return res.sendStatus(403);
-    };
-    req.username = username;
-    console.log(req.username);
-    next();
-  })
-};
 
 app.post('/jwt', (req, res) => {
   const token = generateAccessToken({ username: req.username });
