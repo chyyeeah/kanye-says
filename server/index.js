@@ -13,7 +13,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.static(path.resolve('client/dist')));
 
-const generateAccessToken = data => jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+const generateAccessToken = data => jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: '432000s' });
 const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
   if (token === null || token === undefined) return res.sendStatus(401);
