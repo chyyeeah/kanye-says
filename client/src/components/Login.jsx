@@ -6,12 +6,13 @@ import Banner from './Banner.jsx';
 import checkForToken from '../utils/checkForToken';
 import deleteCookie from '../utils/deleteCookie';
 
-export default ({ isAuthenticated }) => {
+export default ({ isAuthenticated, setIsAuthenticated }) => {
   const loginHandler = () => {
     axios.post('/jwt', { username: 'wilson'})
       .then(res => {
         console.log(res.data);
         document.cookie = `token=${res.data}`;
+        setIsAuthenticated(true);
       });
   };
 
