@@ -1,7 +1,9 @@
 # kanye-says
 
 Have you ever wanted to get Kanye quotes on demand?
+
 No?
+
 Well, too bad! Here they are in all their glory!
 
 ![main](https://github.com/chyyeeah/kanye-says/blob/readme-images/images/main.png?raw=true)
