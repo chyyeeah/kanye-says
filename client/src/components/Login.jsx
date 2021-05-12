@@ -46,7 +46,6 @@ export default ({ isAuthenticated, setIsAuthenticated }) => {
     e.preventDefault();
     axios.post('/login', { username, password })
       .then(res => {
-        console.log(res.data);
         document.cookie = `token=${res.data}`;
         setUsername('');
         setPassword('');
