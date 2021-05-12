@@ -10,7 +10,7 @@ const { checkIfUserExists, createUser, getUserData } = require('./model/index.js
 const { generateAccessToken, authenticateToken } = require('./utils/jwtHelpers.js');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
