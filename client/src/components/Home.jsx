@@ -4,6 +4,7 @@ import { Container, Grid, Paper, Button } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
+import confetti from 'canvas-confetti';
 import Quote from './Quote.jsx';
 import Banner from './Banner.jsx';
 import checkForToken from '../utils/checkForToken';
@@ -38,6 +39,15 @@ export default ({ isAuthenticated, setIsAuthenticated }) => {
     axios.get('/quote')
       .then(res => {
         setQuote(res.data.quote);
+        confetti({
+          particleCount: 100,
+          startVelocity: 30,
+          spread: 360,
+          origin: {
+            x: Math.random(),
+            y: Math.random() - 0.2
+          }
+        });
       })
       .catch(err => {
         setIsAuthenticated(false);

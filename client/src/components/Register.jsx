@@ -4,7 +4,7 @@ import { Grid, Paper, TextField, Button, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
-import Cookies from 'js-cookie';
+import * as yup from 'yup';
 import Banner from './Banner.jsx';
 import checkForToken from '../utils/checkForToken';
 
@@ -29,11 +29,23 @@ const useStyles = makeStyles({
   },
 });
 
+const schema = yup.object().shape({
+  password: yup.string()
+    .required('No password provided')
+    .min(6, 'Password is too short - should be 6 characters minimum')
+    .max(20, 'Password is too long - should be 20 characters maximum'),
+  username: yup.string()
+    .required('No username provided')
+    .min(4, 'Username is too short - should be 4 characters minimum')
+    .max(15, 'Username is too long - should be 15 characters maximum'),
+});
+
 export default ({ isAuthenticated }) => {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ registered, setRegistered ] = useState(false);
   const [ hasError, setHasError ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState('');
 
   const classes = useStyles();
 
@@ -44,15 +56,28 @@ export default ({ isAuthenticated }) => {
 
   const registerHandler = e => {
     e.preventDefault();
-    axios.post('/register', { username, password })
-      .then(res => {
-        setUsername('');
-        setPassword('');
-        if (hasError) setHasError(false);
-        setRegistered(true);
+    schema.validate({ username, password })
+      .then(() => {
+        axios.post('/register', { username, password })
+          .then(res => {
+            setUsername('');
+            setPassword('');
+            if (hasError) {
+              setHasError(false);
+              setErrorMessage('');
+            }
+            setRegistered(true);
+          })
+          .catch(err => {
+            console.error(err);
+            setHasError(true);
+            setErrorMessage('User already exists!');
+          });
       })
       .catch(err => {
+        console.error(err);
         setHasError(true);
+        setErrorMessage(err.errors.join('\n'));
       });
   };
 
@@ -106,7 +131,7 @@ export default ({ isAuthenticated }) => {
       <Banner isAuthenticated={isAuthenticated} />
       <Snackbar open={hasError} autoHideDuration={6000} onClose={() => setHasError(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <MuiAlert elevation={6} variant="filled" severity='error' onClose={() => setHasError(false)}>
-          Registration failed!!!
+          {errorMessage}
         </MuiAlert>
       </Snackbar>
       {authenticated}
