@@ -4,7 +4,7 @@ import { Grid, Paper, TextField, Button, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
-import Cookies from 'js-cookie';
+import * as yup from 'yup';
 import Banner from './Banner.jsx';
 import checkForToken from '../utils/checkForToken';
 import deleteCookie from '../utils/deleteCookie';
@@ -30,12 +30,18 @@ const useStyles = makeStyles({
   },
 });
 
+const schema = yup.object().shape({
+  password: yup.string().required('No password provided'),
+  username: yup.string().required('No username provided'),
+});
+
 export default ({ isAuthenticated, setIsAuthenticated }) => {
   const classes = useStyles();
 
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ hasError, setHasError ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState('');
 
   const updateInput = e => {
     if (e.target.name === 'username') setUsername(e.target.value);
@@ -44,15 +50,30 @@ export default ({ isAuthenticated, setIsAuthenticated }) => {
 
   const loginHandler = e => {
     e.preventDefault();
-    axios.post('/login', { username, password })
-      .then(res => {
-        document.cookie = `token=${res.data}`;
-        setUsername('');
-        setPassword('');
-        setIsAuthenticated(true);
+    schema.validate({ username, password })
+      .then(() => {
+        axios.post('/login', { username, password })
+          .then(res => {
+            document.cookie = `token=${res.data}`;
+            setUsername('');
+            setPassword('');
+            if (hasError) {
+              setHasError(false);
+              setErrorMessage('');
+            }
+            console.log('hit');
+            setIsAuthenticated(true);
+          })
+          .catch(err => {
+            console.error('post request', err);
+            setHasError(true);
+            setErrorMessage('Invalid login!');
+          });
       })
       .catch(err => {
+        console.error('after validation', err);
         setHasError(true);
+        setErrorMessage(err.errors.join('\n'));
       });
   };
 
@@ -104,7 +125,7 @@ export default ({ isAuthenticated, setIsAuthenticated }) => {
       <Banner isAuthenticated={isAuthenticated} />
       <Snackbar open={hasError} autoHideDuration={6000} onClose={() => setHasError(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <MuiAlert elevation={6} variant="filled" severity='error' onClose={() => setHasError(false)}>
-          Login Failed!
+          {errorMessage}
         </MuiAlert>
       </Snackbar>
       {authenticated}
