@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => {
   try {
     const queryResult = await getUserData(req.body.username);
     const userData = queryResult[0];
-    if (!userData.username) return res.status(401).send('Username does not exist.');
+    if (!userData) return res.status(401).send('Username does not exist.');
 
     if (await bcrypt.compare(req.body.password, userData.password)) {
       const token = generateAccessToken({ username: req.body.username });
