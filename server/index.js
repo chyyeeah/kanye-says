@@ -62,9 +62,9 @@ app.get('/quote', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.resolve('client/dist/index.html'), (err) => {
-    if (err) res.status(500).send(err);
+app.get('**', (req, res) => {
+  res.sendFile(path.resolve('client/dist/index.html'), err => {
+    res.status(500).send(err);
   })
 });
 
